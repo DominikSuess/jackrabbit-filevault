@@ -719,6 +719,7 @@ public class JcrPackageImpl implements JcrPackage {
                 // ignore cyclic...
                 continue;
             }
+            log.info("Uninstalling package {} depending on package {}", getDefinition().getId(), id);
             pack.uninstall(processed, opts);
         }
     }
@@ -885,6 +886,7 @@ public class JcrPackageImpl implements JcrPackage {
                             if (pack.getSnapshot() == null) {
                                 log.warn("Unable to uninstall sub package {}. Snapshot missing.", id);
                             } else {
+                                log.info("Uninstalling sub package {} of package {}", id, def.getId());
                                 pack.uninstall(opts);
                             }
                         }
