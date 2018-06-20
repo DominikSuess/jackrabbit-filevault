@@ -370,8 +370,11 @@ public class JcrPackageImpl implements JcrPackage {
      */
     private void extract(Set<PackageId> processed, ImportOptions options, boolean createSnapshot, boolean replaceSnapshot)
             throws RepositoryException, PackageException, IOException {
+        long startTime = System.nanoTime();
         getPackage();
+        log.debug("Execution Time extract after getPackage: {}", System.nanoTime() - startTime);
         getDefinition();
+        log.debug("Execution Time extract after getDefintion: {}", System.nanoTime() - startTime);
         if (def != null) {
             processed.add(def.getId());
         }
@@ -379,6 +382,7 @@ public class JcrPackageImpl implements JcrPackage {
         if (options.getDependencyHandling() != null && options.getDependencyHandling() != DependencyHandling.IGNORE) {
             installDependencies(processed, options, createSnapshot, replaceSnapshot);
         }
+        log.debug("Execution Time extract after installDependencies: {}", System.nanoTime() - startTime);
 
         // get a copy of the import options (bug 35164)
         ImportOptions opts = options.copy();
@@ -388,6 +392,7 @@ public class JcrPackageImpl implements JcrPackage {
             opts.setAutoSaveThreshold(Integer.MAX_VALUE - 1);
         }
         InstallContextImpl ctx = pack.prepareExtract(node.getSession(), opts);
+        log.debug("Execution Time extract after prepareExtract: {}", System.nanoTime() - startTime);
         JcrPackage snap = null;
         if (!opts.isDryRun() && createSnapshot) {
             ExportOptions eOpts = new ExportOptions();
@@ -396,6 +401,7 @@ public class JcrPackageImpl implements JcrPackage {
         }
         List<String> subPackages = new ArrayList<String>();
         pack.extract(ctx, subPackages);
+        log.debug("Execution Time extract after pack.extract: {}", System.nanoTime() - startTime);
         if (def != null && !opts.isDryRun()) {
             def.touchLastUnpacked();
         }
@@ -484,11 +490,13 @@ public class JcrPackageImpl implements JcrPackage {
                 }
             }
         }
-
+        log.debug("Execution Time extract after processing subpackages: {}", System.nanoTime() - startTime);
+        
         // don't extract sub packages if not recursive
         if (!opts.isNonRecursive() && !subPacks.isEmpty()) {
             try {
                 DependencyUtil.sortPackages(subPacks);
+                log.debug("Execution Time extract after sorting subpackages: {}", System.nanoTime() - startTime);
             } catch (CyclicDependencyException e) {
                 if (opts.isStrict()) {
                     throw e;
@@ -527,6 +535,7 @@ public class JcrPackageImpl implements JcrPackage {
                 }
                 p.close();
             }
+            log.debug("Execution Time extract after installing subpackages: {}", System.nanoTime() - startTime);
             // register sub packages in snapshot and on package for uninstall
             if (snap != null) {
                 ((JcrPackageDefinitionImpl) snap.getDefinition()).setSubPackages(subIds);
@@ -542,6 +551,7 @@ public class JcrPackageImpl implements JcrPackage {
         } else {
             mgr.dispatch(PackageEvent.Type.EXTRACT, def.getId(), null);
         }
+        log.debug("Execution Time extraction completed: {}", System.nanoTime() - startTime);
     }
 
     /**

@@ -401,10 +401,12 @@ public class JcrPackageRegistry implements PackageRegistry {
             throws RepositoryException, IOException, PackageExistsException {
 
         MemoryArchive archive = new MemoryArchive(true);
+        long startTime = System.nanoTime();
         InputStreamPump pump = new InputStreamPump(in , archive);
 
         // this will cause the input stream to be consumed and the memory archive being initialized.
         Binary bin = session.getValueFactory().createBinary(pump);
+        log.debug("Execution Time read Binary: {}", System.nanoTime() - startTime);
         if (pump.getError() != null) {
             Exception error = pump.getError();
             log.error("Error while reading from input stream.", error);
@@ -472,6 +474,7 @@ public class JcrPackageRegistry implements PackageRegistry {
                 def.setState(state);
             }
             dispatch(PackageEvent.Type.UPLOAD, pid, null);
+            log.debug("Execution Time upload: {}", System.nanoTime() - startTime);
             return jcrPack;
         } finally {
             bin.dispose();

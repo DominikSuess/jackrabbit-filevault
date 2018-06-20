@@ -422,7 +422,7 @@ public class IntegrationTestBase  {
      */
     public String getInstallationPath(PackageId id) {
         // make sure we use the one from the test parameter
-        return packMgr.getRegistry().getInstallationPath(id) + ".zip";
+        return packMgr.getInternalRegistry().getInstallationPath(id) + ".zip";
     }
 
     public void assertPackageNodeExists(PackageId id) throws RepositoryException {

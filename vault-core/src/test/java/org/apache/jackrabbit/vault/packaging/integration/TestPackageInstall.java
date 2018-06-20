@@ -661,7 +661,7 @@ public class TestPackageInstall extends IntegrationTestBase {
         // root node is not accessible
         AccessControlUtils.addAccessControlEntry(admin, null, principal1, new String[]{"jcr:namespaceManagement","jcr:nodeTypeDefinitionManagement"}, true);
         AccessControlUtils.addAccessControlEntry(admin, "/", principal1, new String[]{"jcr:all"}, false);
-        AccessControlUtils.addAccessControlEntry(admin, packMgr.getRegistry().getPackRootPaths()[0], principal1, new String[]{"jcr:all"}, true);
+        AccessControlUtils.addAccessControlEntry(admin, packMgr.getInternalRegistry().getPackRootPaths()[0], principal1, new String[]{"jcr:all"}, true);
         AccessControlUtils.addAccessControlEntry(admin, "/tmp/foo", principal1, new String[]{"jcr:all"}, true);
         admin.save();
 
@@ -704,7 +704,7 @@ public class TestPackageInstall extends IntegrationTestBase {
         // root node is not accessible
         AccessControlUtils.addAccessControlEntry(admin, null, principal1, new String[]{"jcr:namespaceManagement","jcr:nodeTypeDefinitionManagement"}, true);
         AccessControlUtils.addAccessControlEntry(admin, "/", principal1, new String[]{"jcr:all"}, false);
-        AccessControlUtils.addAccessControlEntry(admin, packMgr.getRegistry().getPackRootPaths()[0], principal1, new String[]{"jcr:all"}, true);
+        AccessControlUtils.addAccessControlEntry(admin, packMgr.getInternalRegistry().getPackRootPaths()[0], principal1, new String[]{"jcr:all"}, true);
         AccessControlUtils.addAccessControlEntry(admin, "/tmp/foo", principal1, new String[]{"jcr:all"}, true);
         admin.save();
 

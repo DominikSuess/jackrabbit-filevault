@@ -91,7 +91,7 @@ public class TestSubPackages extends IntegrationTestBase {
      */
     public String getInstallationPath(PackageId id) {
         // make sure we use the one from the test parameter
-        return packageRoots[0] + packMgr.getRegistry().getRelativeInstallationPath(id) + ".zip";
+        return packageRoots[0] + packMgr.getInternalRegistry().getRelativeInstallationPath(id) + ".zip";
     }
 
     /**

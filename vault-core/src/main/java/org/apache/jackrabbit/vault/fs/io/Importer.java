@@ -328,6 +328,7 @@ public class Importer {
      */
     public void run(Archive archive, Session session,  String parentPath)
             throws IOException, RepositoryException, ConfigurationException {
+        long startTime = System.nanoTime();
         this.archive = archive;
 
         // init tracker
@@ -382,6 +383,7 @@ public class Importer {
             this.archive = archive = new MappedArchive(archive, pathMapping);
             this.archive.open(true);
         }
+        log.debug("Execution Time until after pathmapping: {}", System.nanoTime() - startTime);
 
         // set import mode if possible
         if (opts.getImportMode() != null) {
@@ -413,12 +415,15 @@ public class Importer {
         } else {
             track("Installing node types...", "");
             installNodeTypes(session);
+            log.debug("Execution Time until after installnodetypes: {}", System.nanoTime() - startTime);
             track("Installing privileges...", "");
             registerPrivileges(session);
+            log.debug("Execution Time until after registerprivileges: {}", System.nanoTime() - startTime);
             log.debug("Starting content import. autosave is {}", autoSave);
             track("Importing content...", "");
         }
         cpAutosave = autoSave.copy();
+        log.debug("Execution Time until after autoSave.copy: {}", System.nanoTime() - startTime);
         LinkedList<TxInfo> skipList = new LinkedList<TxInfo>();
         while (recoveryRetryCounter++ < 10) {
             try {
@@ -451,9 +456,13 @@ public class Importer {
                 }
             }
         }
+        log.debug("Execution Time until after commit: {}", System.nanoTime() - startTime);
         checkinNodes(session);
+        log.debug("Execution Time until after checkinNodes: {}", System.nanoTime() - startTime);
         applyMemberships(session);
+        log.debug("Execution Time until after applyMembershipos: {}", System.nanoTime() - startTime);
         applyPatches();
+        log.debug("Execution Time until after applyPatches: {}", System.nanoTime() - startTime);
         if (opts.isDryRun()) {
             if (hasErrors) {
                 track("Package import simulation finished. (with errors, check logs!)", "");

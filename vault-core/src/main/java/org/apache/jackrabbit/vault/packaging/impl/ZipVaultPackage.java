@@ -220,6 +220,7 @@ public class ZipVaultPackage extends PackagePropertiesImpl implements VaultPacka
     protected void extract(InstallContextImpl ctx,
                            List<String> subPackages)
             throws RepositoryException, PackageException {
+        long startTime = System.nanoTime();
         log.debug("Extracting {}", getId());
         InstallHookProcessor hooks = ctx.getHooks();
         Importer importer = ctx.getImporter();
@@ -229,6 +230,7 @@ public class ZipVaultPackage extends PackagePropertiesImpl implements VaultPacka
                 hooks.execute(ctx);
                 throw new PackageException("Import aborted during prepare phase.");
             }
+            log.debug("Execution Time extract after execute prehooks: {}", System.nanoTime() - startTime);
             try {
                 importer.run(archive, ctx.getSession(), ctx.getImportRootPath());
             } catch (Exception e) {
@@ -237,6 +239,7 @@ public class ZipVaultPackage extends PackagePropertiesImpl implements VaultPacka
                 hooks.execute(ctx);
                 throw new PackageException(e);
             }
+            log.debug("Execution Time extract after runimporter: {}", System.nanoTime() - startTime);
             ctx.setPhase(InstallContext.Phase.INSTALLED);
             hooks.execute(ctx);
             if (importer.hasErrors() && ctx.getOptions().isStrict()) {
@@ -244,6 +247,7 @@ public class ZipVaultPackage extends PackagePropertiesImpl implements VaultPacka
                 hooks.execute(ctx);
                 throw new PackageException("Errors during import.");
             }
+            log.debug("Execution Time extract after execute installhooks: {}", System.nanoTime() - startTime);
         } finally {
             ctx.setPhase(InstallContext.Phase.END);
             hooks.execute(ctx);
@@ -252,6 +256,7 @@ public class ZipVaultPackage extends PackagePropertiesImpl implements VaultPacka
             subPackages.addAll(importer.getSubPackages());
         }
         log.debug("Extracting {} completed.", getId());
+        log.debug("Execution Time zipextract complete: {}", System.nanoTime() - startTime);
     }
 
     @Override
