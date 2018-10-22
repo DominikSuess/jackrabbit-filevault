@@ -21,14 +21,17 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.jackrabbit.vault.fs.config.DefaultWorkspaceFilter;
 import org.apache.jackrabbit.vault.fs.io.ImportOptions;
 import org.apache.jackrabbit.vault.packaging.DependencyHandling;
 import org.apache.jackrabbit.vault.packaging.NoSuchPackageException;
 import org.apache.jackrabbit.vault.packaging.PackageException;
 import org.apache.jackrabbit.vault.packaging.PackageId;
+import org.apache.jackrabbit.vault.packaging.ScopedWorkspaceFilter;
 import org.apache.jackrabbit.vault.packaging.registry.PackageRegistry;
 import org.apache.jackrabbit.vault.packaging.registry.PackageTask;
 import org.apache.jackrabbit.vault.packaging.registry.RegisteredPackage;
+import org.apache.jackrabbit.vault.packaging.registry.ScopeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,14 +169,20 @@ public class PackageTaskImpl implements PackageTask {
      */
     private void doInstall(ExecutionPlanImpl plan, boolean extract) throws IOException, PackageException {
         ImportOptions opts = new ImportOptions();
-        opts.setListener(plan.getListener());
+            opts.setListener(plan.getListener());
         // execution plan resolution already has resolved all dependencies, so there is no need to use best effort here.
         opts.setDependencyHandling(DependencyHandling.STRICT);
-
+        
         try (RegisteredPackage pkg = plan.getRegistry().open(id)) {
             if (pkg == null) {
                 throw new NoSuchPackageException("No such package: " + id);
             }
+
+            if (plan.getScopeHandler() instanceof ScopeHandlerImpl) {
+                ScopeHandlerImpl sh = (ScopeHandlerImpl)plan.getScopeHandler();
+                sh.decorateOpts(opts, pkg);
+            }   
+
             PackageRegistry registry = plan.getRegistry();
             if (registry instanceof InternalPackageRegistry) {
               ((InternalPackageRegistry)registry).installPackage(plan.getSession(), pkg, opts, extract);

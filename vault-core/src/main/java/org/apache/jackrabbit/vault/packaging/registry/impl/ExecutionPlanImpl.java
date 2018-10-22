@@ -28,6 +28,7 @@ import org.apache.jackrabbit.vault.packaging.PackageException;
 import org.apache.jackrabbit.vault.packaging.registry.ExecutionPlan;
 import org.apache.jackrabbit.vault.packaging.registry.PackageRegistry;
 import org.apache.jackrabbit.vault.packaging.registry.PackageTask;
+import org.apache.jackrabbit.vault.packaging.registry.ScopeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,8 @@ public class ExecutionPlanImpl implements ExecutionPlan {
     private PackageRegistry registry;
 
     private ProgressTrackerListener listener;
+
+    private ScopeHandler scopeHandler;
 
     private Session session;
 
@@ -84,6 +87,11 @@ public class ExecutionPlanImpl implements ExecutionPlan {
         this.listener = listener;
         return this;
     }
+    
+    ExecutionPlanImpl with(ScopeHandler scopeHandler) {
+        this.scopeHandler = scopeHandler;
+        return this;
+    }
 
     PackageRegistry getRegistry() {
         return registry;
@@ -95,6 +103,10 @@ public class ExecutionPlanImpl implements ExecutionPlan {
 
     Session getSession() {
         return session;
+    }
+
+    ScopeHandler getScopeHandler() {
+        return scopeHandler;
     }
 
     @Override

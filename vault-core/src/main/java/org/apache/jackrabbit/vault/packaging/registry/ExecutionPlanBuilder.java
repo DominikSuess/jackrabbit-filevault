@@ -25,6 +25,8 @@ import javax.jcr.Session;
 
 import org.apache.jackrabbit.vault.fs.api.ProgressTrackerListener;
 import org.apache.jackrabbit.vault.packaging.PackageException;
+import org.apache.jackrabbit.vault.packaging.PackageType;
+import org.apache.jackrabbit.vault.packaging.registry.impl.ScopeTracker;
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -92,4 +94,11 @@ public interface ExecutionPlanBuilder {
      */
     @Nonnull
     ExecutionPlan execute() throws IOException, PackageException;
+    
+    /**
+     * Setting scope to limit to content only matching the corresponding packageType.
+     * @return scopehandler
+     */
+    @Nonnull
+    ScopeHandler setScope(PackageType packageType);
 }

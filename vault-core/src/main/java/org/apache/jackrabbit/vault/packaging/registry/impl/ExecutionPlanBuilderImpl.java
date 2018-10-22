@@ -41,6 +41,7 @@ import org.apache.jackrabbit.vault.packaging.DependencyException;
 import org.apache.jackrabbit.vault.packaging.NoSuchPackageException;
 import org.apache.jackrabbit.vault.packaging.PackageException;
 import org.apache.jackrabbit.vault.packaging.PackageId;
+import org.apache.jackrabbit.vault.packaging.PackageType;
 import org.apache.jackrabbit.vault.packaging.registry.DependencyReport;
 import org.apache.jackrabbit.vault.packaging.registry.ExecutionPlan;
 import org.apache.jackrabbit.vault.packaging.registry.ExecutionPlanBuilder;
@@ -48,6 +49,7 @@ import org.apache.jackrabbit.vault.packaging.registry.PackageRegistry;
 import org.apache.jackrabbit.vault.packaging.registry.PackageTask;
 import org.apache.jackrabbit.vault.packaging.registry.PackageTaskBuilder;
 import org.apache.jackrabbit.vault.packaging.registry.RegisteredPackage;
+import org.apache.jackrabbit.vault.packaging.registry.ScopeHandler;
 import org.apache.jackrabbit.vault.util.RejectingEntityResolver;
 import org.apache.jackrabbit.vault.util.xml.serialize.OutputFormat;
 import org.apache.jackrabbit.vault.util.xml.serialize.XMLSerializer;
@@ -88,10 +90,13 @@ public class ExecutionPlanBuilderImpl implements ExecutionPlanBuilder {
 
     private ProgressTrackerListener listener;
 
+    private ScopeHandlerImpl scopeHandler;
+
     private ExecutionPlanImpl plan;
 
     ExecutionPlanBuilderImpl(PackageRegistry registry) {
         this.registry = registry;
+        this.scopeHandler = new ScopeHandlerImpl();
     }
 
     @Nonnull
@@ -326,7 +331,7 @@ public class ExecutionPlanBuilderImpl implements ExecutionPlanBuilder {
                 }
             }
         }
-        return plan.with(registry).with(session).with(listener).execute();
+        return plan.with(registry).with(session).with(listener).with(scopeHandler).execute();
     }
 
     private class TaskBuilder implements PackageTaskBuilder {
@@ -345,4 +350,11 @@ public class ExecutionPlanBuilderImpl implements ExecutionPlanBuilder {
             return ExecutionPlanBuilderImpl.this;
         }
     }
+
+    public ScopeHandler setScope(PackageType packageType) {
+        scopeHandler.setScope(packageType);
+        return scopeHandler;
+    }
+
+
 }
